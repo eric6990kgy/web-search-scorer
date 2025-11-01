@@ -1,0 +1,124 @@
+智能網路內容搜尋與評分系統 技術說明書
+專案檔案結構
+text
+web-search-scorer/
+├── ContentScorer.py        # 搜尋與評分邏輯核心
+├── app.py                  # Streamlit 網頁主程式
+├── requirements.txt        # Python 套件依賴清單
+└── .gitignore              # Git 忽略檔案
+主要套件
+streamlit
+
+requests
+
+beautifulsoup4
+
+pandas
+
+scikit-learn
+
+plotly
+
+openpyxl
+
+lxml
+
+模組/主檔案簡介
+1. ContentScorer.py
+說明：
+所有內容搜尋與評分算法都集中在這份檔案。
+
+主要類別與函數
+class WebContentScorer
+
+__init__(self, serpapi_key=None): 初始化，設定請求標頭與黑名單網站
+
+search_google_serpapi(keyword, num_results): Google（SerpAPI）搜尋、過濾黑名單
+
+search_duckduckgo(keyword, num_results): DuckDuckGo 搜尋、過濾黑名單
+
+extract_content_advanced(url): 伺服器爬蟲自動萃取主體內容、標題、日期
+
+calculate_relevance_score(keyword, content, title, snippet): 關聯性評分算法
+
+calculate_quality_score(content, url, title, publish_date): 內容品質評分算法
+
+calculate_final_score(relevance, quality): 綜合評分（依權重相加）
+
+run(keyword, num_results): 主管道，呼叫前述所有方法，回傳DataFrame
+
+export_results(df, filename): DataFrame匯出Excel或CSV
+
+2. app.py
+說明：
+Streamlit 主程式，負責 UI、設定、流程控制與互動展示。
+
+主要 UI 功能
+參數調整（API Key、搜尋數量、分數權重）
+
+關鍵詞輸入及快速搜尋按鈕
+
+實時進度條
+
+視覺化結果（統計卡片、圖表、分頁）
+
+TOP 3 詳細資料
+
+資料匯出（Excel/CSV/JSON 格式）
+
+評分演算法邏輯
+相關性評分（0-100，權重60%）
+TF-IDF語義相似度 × 40
+
+標題完全匹配+25
+
+標題部分關聯+15
+
+正文關鍵詞頻率（每次2分，最多20）
+
+關鍵詞出現在開頭加分（最大15分）
+
+品質評分（0-100，權重40%）
+內容深度（字數、結構）共30分
+
+內容豐富度（數字、引用、標點）共25分
+
+網站信任度：新聞/專業/HTTPS 最高15~8分
+
+時效性：一週內15分、最舊1分、缺日期5分
+
+可讀性：標題理想+5，無垃圾內容+5
+
+綜合評分
+text
+score = 相關性 * 0.6 + 品質 * 0.4
+黑名單過濾
+過濾 wikipedia.org、baike.baidu.com、wikimedia...等非原創或大型百科網站
+
+主要流程
+用戶輸入關鍵字
+
+發送 Google/DuckDuckGo 搜尋
+
+過濾黑名單與重複網頁
+
+抓取正文、自動找主體區塊
+
+多重指標進行相關性與品質打分
+
+最終排序輸出 DataFrame
+
+Streamlit UI 多視角展示（卡片、圖表、表格、TOP3詳情）
+
+實用功能亮點
+先進自動內容辨識（BeautifulSoup 多種選擇器）
+
+可彈性調整權重（Streamlit 側欄操作）
+
+支援 API/免費方案自動切換搜尋引擎
+
+結構清楚、擴充維護容易
+
+統計、圖表、原始表格全自動產出
+
+支援多種檔案格式匯出
